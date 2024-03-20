@@ -1,9 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap');
 
-html {
+html, body {
     margin: 0;
     padding: 0;
-
 }
 
 * {
@@ -14,12 +13,65 @@ html {
     color: #fff;
     text-transform: uppercase;
     font-size: 15px;
-    background: linear-gradient(45deg, #902ECB, #02CBA4);
+    background: linear-gradient(45deg, rgb(144, 46, 203), rgb(2, 203, 164));
     padding: 12px 30px;
     border-radius: 30px;
     border: none; 
 }
 
 .primary-button:hover {
-    background: linear-gradient(260deg, #902ECB, #02CBA4);
+    background: linear-gradient(260deg, (144, 46, 203), rgb(2, 203, 164));
+}
+
+body {
+    text-align: center;
+}
+
+
+/* ---- NavBar ---- */
+nav {
+    width: 100%;
+    /* Flex makes our btn's appear next to eachother on the same row */
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Below is styling for Log In btn */
+nav .nav-button {
+    color: rgb(144, 46, 203);
+    background-color: rgb(255, 255, 255);
+    font-size: 20px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    margin: 10px;
+}
+
+nav .logo-container {
+    width: 100px;
+    margin: 15px;
+}
+
+nav .logo-container .logo {
+    width: 100%;
+    color: rgb(144, 46, 203);
+    background-color: rgb(255, 255, 255);
+    font-size: 20px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: none;
+
+}
+
+
+/* ---- Home Page ---- */
+.overlay {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background: linear-gradient(
+        to bottom, 
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(0, 0, 0, 0) 100%
+    )
 }

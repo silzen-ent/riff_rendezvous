@@ -1,5 +1,4 @@
 // The Home page is what anyone sees at any point in time, whether they're logged in or not
-
 import Nav from '../components/Nav'
 
 const Home = () => {
@@ -11,8 +10,10 @@ const Home = () => {
     }
 
     return(
-        <>
-        <Nav/> 
+        <div className="overlay">
+        {/* Change minimal below back to false when UI is complete */}
+        {/* If minimal true, show black logo. ELIF false, show white logo */}
+        <Nav minimal={false} authToken={authToken}/> 
         <div className="home">
             <h1>Harmony's Just a Swipe Away!®</h1>
                 {/* <h2>Connect</h2>
@@ -22,7 +23,7 @@ const Home = () => {
                 {authToken ? 'Log Out' : 'Create Account'}
             </button>
         </div>
-        </>
+        </div> 
     )
 }
 export default Home
