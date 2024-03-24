@@ -34,7 +34,7 @@ const Home = () => {
                     {authToken ? 'Log Out' : 'Create Account'}
                 </button>
 
-                {/* Below lets us set the state for showModal above from another component. If showModal is true, then we're going to show the authModal */}
+                {/* Below lets us set state for showModal above from another component. If it's true, then we show the authModal */}
                 {showModal && (
                     <AuthModal setShowModal={setShowModal} isSignUp={isSignUp}/>
                 )}

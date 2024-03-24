@@ -13,7 +13,7 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
     const handleClick = () => {
         setShowModal(false)
     }
-    // This FN will handle form submission, & prevent page from refreshing. 
+    // This FN will handle form submission, & prevents page from refreshing. 
     // Also handles Error Handling & Input Validation in JS
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -37,7 +37,7 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
             <h2>{isSignUp ? 'CREATE ACCOUNT' : 'LOG IN'}</h2>
             <p>By clicking Log In, you agree to our terms. Learn how we process your data in our Privacy Policy and Cookie Policy.</p>
             <form onSubmit={handleSubmit}> 
-                {/* If user is signing up, we need to see the below 2 input fields */}
+                {/* If user is signing up, we need to see the 2 input fields below */}
                 <input
                     type="email"
                     id="email"
