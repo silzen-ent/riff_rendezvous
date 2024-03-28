@@ -1,4 +1,8 @@
 import { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { useCookies } from 'react-cookie'
+
 
 // We're going to have the btn in the Nav & Homepage decide whether we show the AuthModal or not
 const AuthModal = ({ setShowModal, isSignUp }) => {
@@ -6,6 +10,9 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
     const [password, setPassword] = useState(null)
     const [confirmedPassword, setConfirmedPassword] = useState(null)
     const [error, setError] = useState(null) 
+    const [cookies, setCookie, removeCookie] = useCookies(['user'])
+
+    let navigate = useNavigate()
 
     console.log(email, password, confirmedPassword)
 
@@ -15,22 +22,34 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
     }
     // This FN will handle form submission, & prevents page from refreshing. 
     // Also handles Error Handling & Input Validation in JS
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             // If the user is trying to sign up, pw's need to match
             if(isSignUp && (password !== confirmedPassword)) {
                 // If they don't, we'll set an error message
                 setError('Passwords need to match!')
+                return
             }
             // Otherwise, we'll make a post request to our database
-            console.log('make a post request to our database')
+            console.log('posting', email, password)
+            const response = await axios.post(`http://localhost:8000/${isSignUp ? 'signup' : 'login'}`, { email, password })
+
+            setCookie('AuthToken', response.data.token)
+            setCookie('UserId', response.data.userId)
+
+            const success = response.status === 201
+
+            if (success && isSignUp) navigate('/onboarding')
+            if (success && !isSignUp) navigate('/dashboard')
+
+            window.location.reload()
+
         } catch (error) {
             console.log(error)
         }
-    } 
-
-
+    }
+ 
     return (
         <div className="auth-modal">
             <div className="close-icon" onClick={handleClick}>ⓧ</div>

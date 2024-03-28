@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
     res.json('Hello to my app!')
 })
 
+
 // This route handles the signup request from the client & how we pass data from FE to BE.
 app.post('/signup', async (req, res) => {
     const client = new MongoClient(uri)
@@ -60,6 +61,7 @@ app.post('/signup', async (req, res) => {
     }
 })
 
+
 // The route is for Logging In
 app.post('/login', async (req, res) => {
     const client = new MongoClient(uri)
@@ -86,6 +88,7 @@ app.post('/login', async (req, res) => {
     }
 })
 
+
 // This route is for getting one user by their user id
 app.get('/user', async (req, res) => {
     const client = new MongoClient(uri)
@@ -108,8 +111,6 @@ app.get('/user', async (req, res) => {
 })
 
 
-
-
 // This route is for passing thru an array of matched users to users
 app.get('/users', async (req, res) => {
     const client = new MongoClient(uri)
@@ -121,13 +122,25 @@ app.get('/users', async (req, res) => {
         const database = client.db('app-data') // select the database
         const users = database.collection('users') // select the collection
 
+        const pipeline = 
+            [
+                {
+                    '$match': {
+                        'user_id': {
+                            '$in': userIds
+                        }
+                    }
+                }
+            ]
+        const foundUsers = await users.aggregate(pipeline).toArray()
+        console.log(foundUsers)
+        res.send(foundUsers)
+
     } finally {
         await client.close()
     }
 })
 
-
-  
 
 // This route is for getting multiple gendered users
 app.get('/gendered-users', async (req, res) => { 
@@ -141,7 +154,6 @@ app.get('/gendered-users', async (req, res) => {
         const database = client.db('app-data') // select the database
         const users = database.collection('users') // select the collection
         const query = { gender_identity: {$eq : gender}}
-        
         const foundUsers = await users.find(query).toArray() // get all the users in the collection
 
         res.send(foundUsers) // send the users to the client
@@ -149,6 +161,7 @@ app.get('/gendered-users', async (req, res) => {
         await client.close() // close the connection
     }
 })
+
 
 // This route is for updating user's info with the Onboarding Form Data from the client
 app.put('/user', async (req, res) => {
@@ -182,6 +195,7 @@ app.put('/user', async (req, res) => {
     }
 })
 
+
 app.put('/addmatch', async (req, res) => {
     const client = new MongoClient(uri)
     const { userId, matchedUserId } = req.body
@@ -202,6 +216,25 @@ app.put('/addmatch', async (req, res) => {
     }
 })
 
+
+app.get('/messages', async (req, res) => {
+    const client = new MongoClient(uri)
+    const { userId, correspondingUserId } = req.query
+    console.log(userId, correspondingUserId)
+    try {
+        await client.connect()
+        const database = client.db('app-data')
+        const messages = database.collection('messages')
+    
+        const query = {
+            from_userId: userId, to_userId: correspondingUserId
+        }
+        const foundMessages = await messages.find(query).toArray()
+        res.send(foundMessages)
+    } finally {
+        await client.close()
+    }
+})
 
 app.listen(PORT, () => console.log('Server running on PORT ' + PORT)) 
 

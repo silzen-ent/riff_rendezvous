@@ -1,5 +1,5 @@
 // importing useState so we can save the state of the Chats
-import { useState }from 'react'
+import { useState } from 'react'
 
 const ChatInput = () => {
     const [textArea, setTextArea] = useState(null)
