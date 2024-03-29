@@ -25,7 +25,6 @@ const Onboarding = () => {
 
     // This FN handles form submissions
     const handleSubmit = async (e) => {
-        // console.log('submitted')
         e.preventDefault()
         try {
             const response = await axios.put('http://localhost:8000/user', { formData })

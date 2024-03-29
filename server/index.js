@@ -93,8 +93,6 @@ app.post('/login', async (req, res) => {
 app.get('/user', async (req, res) => {
     const client = new MongoClient(uri)
     const userId = req.query.userId
-
-    console.log('userId', userId)
     
     try {
         await client.connect()
@@ -115,7 +113,6 @@ app.get('/user', async (req, res) => {
 app.get('/users', async (req, res) => {
     const client = new MongoClient(uri)
     const userIds = JSON.parse(req.query.userIds)
-    console.log(userIds)
 
     try {
         await client.connect() // connect to the database
@@ -133,7 +130,6 @@ app.get('/users', async (req, res) => {
                 }
             ]
         const foundUsers = await users.aggregate(pipeline).toArray()
-        console.log(foundUsers)
         res.send(foundUsers)
 
     } finally {
@@ -146,8 +142,6 @@ app.get('/users', async (req, res) => {
 app.get('/gendered-users', async (req, res) => { 
     const client = new MongoClient(uri) // create a new client
     const gender = req.query.gender
-
-    console.log('gender', gender)
 
     try {
         await client.connect() // connect to the database
@@ -220,7 +214,6 @@ app.put('/addmatch', async (req, res) => {
 app.get('/messages', async (req, res) => {
     const client = new MongoClient(uri)
     const { userId, correspondingUserId } = req.query
-    console.log(userId, correspondingUserId)
     try {
         await client.connect()
         const database = client.db('app-data')
@@ -231,6 +224,21 @@ app.get('/messages', async (req, res) => {
         }
         const foundMessages = await messages.find(query).toArray()
         res.send(foundMessages)
+    } finally {
+        await client.close()
+    }
+})
+
+app.post('/message', async (req, res) => {
+    const client = new MongoClient(uri)
+    const message = req.body.message
+    
+    try {
+        await client.connect()
+        const database = client.db('app-data')
+        const messages = database.collection('messages')
+        const insertedMessage = await messages.insertOne(message)
+        res.send(insertedMessage)    
     } finally {
         await client.close()
     }

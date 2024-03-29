@@ -7,12 +7,13 @@ const Home = () => {
     const [showModal, setShowModal] = useState(false)
     // We set isSignUp to true by default b/c we assume that the user is trying to sign up
     const [isSignUp, setIsSignUp] = useState(true)
+    // const [cookies, setCookie, removeCookie] = useCookies(['user'])
+    // const authToken = cookies.AuthToken
 
     
     const authToken = false // this is a piece of info that verifies the user's identity
 
     const handleClick = () => {
-        console.log('clicked')
         setShowModal(true)
         setIsSignUp(true)
     }
