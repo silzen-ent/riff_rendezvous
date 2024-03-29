@@ -27,21 +27,19 @@ const Onboarding = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.put('http://localhost:8000/user', { formData })
+            const response = await axios.put('http://localhost:8000/user', {formData})
             const success = response.status === 200
             if (success) navigate ('/dashboard')
         } catch (err) {
             console.log(err)
         }
         
-    }
+    }    
 
     // This FN handles form changes
     const handleChange = (e) => {
-        console.log('e', e)
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
         const name = e.target.name
-        console.log('value' + value, 'name' + name)
 
         // Using the prevState FN to update the state of form data
         setFormData((prevState) => ({
@@ -50,7 +48,6 @@ const Onboarding = () => {
         }))
     }
 
-    console.log(formData)
 
     // This is the form that users will fill out to create an account
     return (
