@@ -1,4 +1,5 @@
-// 2.0
+// This page is for users when they are logged in
+// Imported a react component to make swipeable elements like in a swipe app 
 import TinderCard from 'react-tinder-card'
 import {useEffect, useState} from 'react'
 import ChatContainer from '../components/ChatContainer'
@@ -8,11 +9,13 @@ import axios from 'axios'
 const Dashboard = () => {
     const [user, setUser] = useState(null)
     const [genderedUsers, setGenderedUsers] = useState(null)
-    const [lastDirection, setLastDirection] = useState()
+    const [lastDirection, setLastDirection] = useState() // This is saving the direction of the last swipe
     const [cookies, setCookie, removeCookie] = useCookies(['user'])
 
-    const userId = cookies.UserId
+// We're going to use the user's id to get their info from the database
+    const userId = cookies.UserId;
 
+  // This FN will get the user's info from the DB using their id (which we get from the variable above)
 
     const getUser = async () => {
         try {
@@ -88,6 +91,7 @@ const Dashboard = () => {
                             <TinderCard
                                 className="swipe"
                                 key={genderedUser.user_id}
+                                // With onSwipe, we're logging the direction which then goes to the swiped FN & changes the last direction for us so we can see what the last swipe was
                                 onSwipe={(dir) => swiped(dir, genderedUser.user_id)}
                                 onCardLeftScreen={() => outOfFrame(genderedUser.first_name)}>
                                 <div

@@ -14,8 +14,8 @@ const Onboarding = () => {
         dob_month: '',
         dob_year: '',
         show_gender: false,
-        gender_identity: 'man',
-        gender_interest: 'woman',
+        gender_identity: '',
+        gender_interest: '',
         url: '',
         about: '', 
         matches: []
@@ -140,7 +140,7 @@ const Onboarding = () => {
                             <label htmlFor="more-gender-identity">More</label>
                         </div>
 
-                        <label htmlFor="show-gender">Show gender on my profile</label>
+                        <label htmlFor="show-gender">Show Gender on my Profile</label>
                         <input
                             id="show-gender"
                             type="checkbox"

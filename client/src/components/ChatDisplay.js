@@ -1,7 +1,7 @@
 import Chat from './Chat'
 import ChatInput from './ChatInput'
 import axios from 'axios'
-import { useState, useEffect } from 'react'
+import {useState, useEffect} from 'react'
 
 // This component shows all the chats the user has with their "matchees". 
 const ChatDisplay = ({user, clickedUser}) => {
@@ -34,7 +34,7 @@ const ChatDisplay = ({user, clickedUser}) => {
     }
 
 
-    useEffect(()=>{
+    useEffect(() => {
         getUsersMessages()
         getClickedUsersMessages()
     }, [])  

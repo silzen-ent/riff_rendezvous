@@ -10,9 +10,11 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
     const [password, setPassword] = useState(null)
     const [confirmedPassword, setConfirmedPassword] = useState(null)
     const [error, setError] = useState(null) 
-    const [cookies, setCookie, removeCookie] = useCookies(['user'])
+    const [cookies, setCookie, removeCookie] = useCookies(null)
 
     let navigate = useNavigate()
+
+    console.log(email, password, confirmedPassword)
 
     const handleClick = () => {
         setShowModal(false)
@@ -23,22 +25,21 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
         e.preventDefault()
         try {
             // If the user is trying to sign up, pw's need to match
-            if(isSignUp && (password !== confirmedPassword)) {
+            if (isSignUp && (password !== confirmedPassword)) {
                 // If they don't, we'll set an error message
                 setError('Passwords need to match!')
                 return
             }
             // Otherwise, we'll make a post request to our database
-            console.log('posting', email, password)
+            // console.log('posting', email, password)
             const response = await axios.post(`http://localhost:8000/${isSignUp ? 'signup' : 'login'}`, { email, password })
 
             setCookie('AuthToken', response.data.token)
             setCookie('UserId', response.data.userId)
 
             const success = response.status === 201
-
-            if (success && isSignUp) navigate('/onboarding')
-            if (success && !isSignUp) navigate('/dashboard')
+            if (success && isSignUp) navigate ('/onboarding')
+            if (success && !isSignUp) navigate ('/dashboard')
 
             window.location.reload()
 
@@ -75,7 +76,7 @@ const AuthModal = ({ setShowModal, isSignUp }) => {
                     type="password"
                     id="password-check"
                     name="password-check"
-                    placeholder="confirm password"
+                    placeholder="confirmed password"
                     required={true}
                     onChange={(e) => setConfirmedPassword(e.target.value)}
                 />}

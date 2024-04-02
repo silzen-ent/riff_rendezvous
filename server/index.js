@@ -38,7 +38,7 @@ app.post('/signup', async (req, res) => {
         const users = database.collection('users') 
         
         const existingUser = await users.findOne({email}) 
-
+ 
         if (existingUser) {
             return res.status(409).send('User already exists. Please log in.') 
         }
@@ -64,8 +64,35 @@ app.post('/signup', async (req, res) => {
     }
 })
 
+// // // This route was giving me issues with Invalid Credentials. 
+// // The route is for Logging In
+// app.post('/login', async (req, res) => {
+//     const client = new MongoClient(uri)
+//     const {email, password} = req.body
 
-// The route is for Logging In
+//     try {
+//         await client.connect()
+//         const database = client.db('app-data')
+//         const users = database.collection('users')
+
+//         const user = await users.findOne({email})
+
+//         const correctPassword = await bcrypt.compare(password, user.hashed_password)
+
+//         if (user && correctPassword) {
+//             const token = jwt.sign(user, email, {
+//                 expiresIn: 60 * 24
+//             })
+//             res.status(201).json({token, userId: user.user_id})
+//         }
+//         res.status(400).json('Invalid Credentials') 
+//     } catch (err) {
+//         console.log(err)
+//     } finally {
+//         await client.close()
+//     }
+// })
+
 app.post('/login', async (req, res) => {
     const client = new MongoClient(uri)
     const {email, password} = req.body
@@ -77,15 +104,19 @@ app.post('/login', async (req, res) => {
 
         const user = await users.findOne({email})
 
+        if (!user) {
+            return res.status(400).json('User not found')
+        }
+
         const correctPassword = await bcrypt.compare(password, user.hashed_password)
 
-        if (user && correctPassword) {
+        if (correctPassword) {
             const token = jwt.sign(user, email, {
                 expiresIn: 60 * 24
             })
-            res.status(201).json({token, userId: user.user_id})
+            return res.status(201).json({token, userId: user.user_id})
         }
-        // res.status(400).json('Invalid Credentials')
+        return res.status(400).json('Invalid Credentials') 
     } catch (err) {
         console.log(err)
     } finally {
@@ -114,7 +145,29 @@ app.get('/user', async (req, res) => {
 })
 
 
-// This route is for passing thru an array of matched users to users
+// Update User with a match
+app.put('/addmatch', async (req, res) => {
+    const client = new MongoClient(uri)
+    const {userId, matchedUserId} = req.body
+
+    try {
+        await client.connect()
+        const database = client.db('app-data') 
+        const users = database.collection('users') 
+
+        const query = {user_id: userId}
+        const updateDocument = {
+            $push: {matches: {user_id: matchedUserId}},
+        }
+        const user = await users.updateOne(query, updateDocument)
+        res.send(user)
+    } finally {
+        await client.close()
+    }
+})
+
+
+// This route is to get all Users by userIds in the Database 
 app.get('/users', async (req, res) => {
     const client = new MongoClient(uri)
     const userIds = JSON.parse(req.query.userIds)
@@ -143,7 +196,7 @@ app.get('/users', async (req, res) => {
 })
 
 
-// This route is for getting multiple gendered users
+// This route is to get all the Gendered Users in the Database
 app.get('/gendered-users', async (req, res) => { 
     const client = new MongoClient(uri) // create a new client
     const gender = req.query.gender
@@ -154,14 +207,15 @@ app.get('/gendered-users', async (req, res) => {
         const users = database.collection('users') // select the collection
         const query = {gender_identity: {$eq: gender}}
         const foundUsers = await users.find(query).toArray() // get all the users in the collection
-
         res.json(foundUsers) // send the users to the client
+
     } finally {
         await client.close() // close the connection
     }
 })
 
 
+// Update a User in the Database
 // This route is for updating user's info with the Onboarding Form Data from the client
 app.put('/user', async (req, res) => {
     const client = new MongoClient(uri)
@@ -188,38 +242,22 @@ app.put('/user', async (req, res) => {
                 matches: formData.matches
             },
         }
+
         const insertedUser = await users.updateOne(query, updateDocument)
+
         res.json(insertedUser)
+
     } finally {
         await client.close()
     }
 })
 
 
-app.put('/addmatch', async (req, res) => {
-    const client = new MongoClient(uri)
-    const {userId, matchedUserId} = req.body
-
-    try {
-        await client.connect()
-        const database = client.db('app-data') 
-        const users = database.collection('users') 
-
-        const query = {user_id: userId}
-        const updateDocument = {
-            $push: {matches: {user_id: matchedUserId}},
-        }
-        const user = await users.updateOne(query, updateDocument)
-        res.send(user)
-    } finally {
-        await client.close()
-    }
-})
-
-
+// Get Messages by from_userId and to_userId
 app.get('/messages', async (req, res) => {
-    const client = new MongoClient(uri)
     const {userId, correspondingUserId} = req.query
+    const client = new MongoClient(uri)
+
     try {
         await client.connect()
         const database = client.db('app-data')
@@ -235,6 +273,7 @@ app.get('/messages', async (req, res) => {
     }
 })
 
+// Add a Message to our Database
 app.post('/message', async (req, res) => {
     const client = new MongoClient(uri)
     const message = req.body.message
@@ -243,6 +282,7 @@ app.post('/message', async (req, res) => {
         await client.connect()
         const database = client.db('app-data')
         const messages = database.collection('messages')
+
         const insertedMessage = await messages.insertOne(message)
         res.send(insertedMessage)    
     } finally {
