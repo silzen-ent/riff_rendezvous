@@ -290,5 +290,9 @@ app.post('/message', async (req, res) => {
     }
 })
 
+// Deletes User from Database
+
+
+
 app.listen(PORT, () => console.log('Server running on PORT ' + PORT)) 
 
