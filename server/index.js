@@ -64,8 +64,8 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-// // // This route was giving me issues with Invalid Credentials. 
-// // The route is for Logging In
+// This route was giving me issues with Invalid Credentials. 
+// The route is for Logging In
 // app.post('/login', async (req, res) => {
 //     const client = new MongoClient(uri)
 //     const {email, password} = req.body
@@ -93,6 +93,9 @@ app.post('/signup', async (req, res) => {
 //     }
 // })
 
+
+// This route was giving me issues with Invalid Credentials. 
+// The route is for Logging In
 app.post('/login', async (req, res) => {
     const client = new MongoClient(uri)
     const {email, password} = req.body
@@ -217,9 +220,53 @@ app.get('/gendered-users', async (req, res) => {
 
 // Update a User in the Database
 // This route is for updating user's info with the Onboarding Form Data from the client
+// app.put('/user', async (req, res) => {
+//     const client = new MongoClient(uri)
+//     const formData = req.body.formData
+    
+//     try {
+//         await client.connect()
+//         const database = client.db('app-data') 
+//         const users = database.collection('users') 
+
+//         const query = {user_id: formData.user_id}
+
+//         const updateDocument = {
+//             $set: {
+//                 first_name: formData.first_name,
+//                 dob_month: formData.dob_month,
+//                 dob_day: formData.dob_day,
+//                 dob_year: formData.dob_year,
+//                 show_gender: formData.show_gender,
+//                 gender_identity: formData.gender_identity,
+//                 gender_interest: formData.gender_interest,
+//                 url: formData.url,
+//                 about: formData.about,
+//                 matches: formData.matches
+//             },
+//         }
+
+//         const insertedUser = await users.updateOne(query, updateDocument)
+
+//         res.json(insertedUser)
+
+//     } finally {
+//         await client.close()
+//     }
+// })
+
+
 app.put('/user', async (req, res) => {
     const client = new MongoClient(uri)
     const formData = req.body.formData
+    
+    // Extract "dob_month", "dob_day", and "dob_year" from formData
+    const { dob_month, dob_day, dob_year } = formData;
+
+    // Convert these values to integers
+    const month = parseInt(dob_month, 10);
+    const day = parseInt(dob_day, 10);
+    const year = parseInt(dob_year, 10);
     
     try {
         await client.connect()
@@ -228,12 +275,13 @@ app.put('/user', async (req, res) => {
 
         const query = {user_id: formData.user_id}
 
+        // Include the converted values in your updateDocument
         const updateDocument = {
             $set: {
                 first_name: formData.first_name,
-                dob_month: formData.dob_month,
-                dob_day: formData.dob_day,
-                dob_year: formData.dob_year,
+                dob_month: month,
+                dob_day: day,
+                dob_year: year,
                 show_gender: formData.show_gender,
                 gender_identity: formData.gender_identity,
                 gender_interest: formData.gender_interest,
@@ -251,6 +299,8 @@ app.put('/user', async (req, res) => {
         await client.close()
     }
 })
+
+
 
 
 // Get Messages by from_userId and to_userId
@@ -291,7 +341,29 @@ app.post('/message', async (req, res) => {
 })
 
 // Deletes User from Database
+app.delete('/user', async (req, res) => {
+    const client = new MongoClient(uri)
+    const { userId } = req.body
 
+    try {
+        await client.connect()
+        const database = client.db('app-data')
+        const users = database.collection('users')
+
+        const result = await users.deleteOne({ user_id: userId })
+
+        if (result.deletedCount === 1) {
+            res.status(200).json('User deleted successfully')
+        } else {
+            res.status(404).json('User not found')
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json('Server error')
+    } finally {
+        await client.close()
+    }
+})
 
 
 app.listen(PORT, () => console.log('Server running on PORT ' + PORT)) 

@@ -5,12 +5,16 @@ import {useEffect, useState} from 'react'
 import ChatContainer from '../components/ChatContainer'
 import {useCookies} from 'react-cookie'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+
 
 const Dashboard = () => {
     const [user, setUser] = useState(null)
     const [genderedUsers, setGenderedUsers] = useState(null)
     const [lastDirection, setLastDirection] = useState() // This is saving the direction of the last swipe
     const [cookies, setCookie, removeCookie] = useCookies(['user'])
+
+    const navigate = useNavigate()
 
 // We're going to use the user's id to get their info from the database
     const userId = cookies.UserId;
@@ -27,6 +31,7 @@ const Dashboard = () => {
             console.log(error)
         }
     }
+
     const getGenderedUsers = async () => {
         try {
             const response = await axios.get('http://localhost:8000/gendered-users', {
@@ -37,6 +42,25 @@ const Dashboard = () => {
             console.log(error)
         }
     }
+
+    // Deletion Operation for the User Model 
+    const deleteUser = async () => {
+        try {
+            const response = await axios.delete('http://localhost:8000/user', {
+                data: { userId: cookies.UserId }
+            })
+            if (response.status === 200) {
+                console.log('User deleted successfully')
+                // Navigate to home page after successful deletion
+                navigate('/')
+            } else {
+                console.log('Failed to delete user')
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
     useEffect(() => {
         getUser()
@@ -106,6 +130,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+                <button className="delete-profile-button" onClick={deleteUser}>Delete Profile</button>
             </div>}
         </>
     )

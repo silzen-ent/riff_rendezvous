@@ -6,7 +6,7 @@ import axios from 'axios'
 import Nav from '../components/Nav'
 
 const Onboarding = () => {
-    const [cookies, setCookie, removeCookie] = useCookies(['user'])
+    const [cookies, setCookie, removeCookie] = useCookies(null)
     const [formData, setFormData] = useState({
         user_id: cookies.UserId,
         first_name: '',
@@ -23,7 +23,7 @@ const Onboarding = () => {
 
     let navigate = useNavigate()
 
-    // This FN handles form submissions
+    // This FN handles form submissions from the Onboarding page & updates user's info in the DB
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
@@ -44,7 +44,7 @@ const Onboarding = () => {
         // Using the prevState FN to update the state of form data
         setFormData((prevState) => ({
             ...prevState,
-            [name] : value
+            [name]: value
         }))
     }
 

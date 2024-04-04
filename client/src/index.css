@@ -268,6 +268,9 @@ nav .logo-container .logo {
     border-radius: 30px;
     background-size: cover;
     background-position: center;
+    /* add white font to the card */
+    color: white;
+    /* add space between the name and the card below */
 }
 
 
@@ -281,7 +284,24 @@ nav .logo-container .logo {
     bottom: 0;
     padding: 10px; 
 }
+/* Styling the "delete-profile-button" so that it looks more aesthetic */
+.dashboard .delete-profile-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px; /* Use 'left: 20px;' for left side */
+    padding: 10px 20px;
+    background-color: rgb(144, 46, 203); /* Same purple color as used elsewhere in the dashboard */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
+.dashboard .delete-profile-button:hover {
+    background-color: rgb(138, 28, 207); /* Slightly different purple for hover effect */
+}
 
 /* ---- ChatContainer Component ---- */
 .chat-container {
@@ -315,6 +335,7 @@ nav .logo-container .logo {
     border-bottom: solid 4px rgb(187, 187, 187);
 }
 
+
 .chat-container .profile, 
 .chat-container .log-out-icon {
     display: flex;
@@ -322,6 +343,13 @@ nav .logo-container .logo {
     padding: 20px;
     color: rgb(255, 255, 255);
 }
+
+
+/* position log-out-icon more to the left */
+.log-out-icon {
+    margin-left: 20px;
+}
+
 
 .img-container {
     height: 30px;
