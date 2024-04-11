@@ -53,14 +53,32 @@ const Onboarding = () => {
 
     // This FN handles form changes
     const handleChange = (e) => {
-        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
         const name = e.target.name
-
-        // Using the prevState FN to update the state of form data
-        setFormData((prevState) => ({
-            ...prevState,
-            [name]: value
-        }))
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    
+        if (name === 'genres') {
+            const genreId = e.target.value
+            const genre = genres.find(g => g.genre_id === genreId)
+    
+            if (value) {
+                // Checkbox is checked, add the genre to the genres array
+                setFormData(prevState => ({
+                    ...prevState,
+                    genres: [...prevState.genres, genre]
+                }))
+            } else {
+                // Checkbox is unchecked, remove the genre from the genres array
+                setFormData(prevState => ({
+                    ...prevState,
+                    genres: prevState.genres.filter(g => g.genre_id !== genreId)
+                }))
+            }
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }))
+        }
     }
 
 
