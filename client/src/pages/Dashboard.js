@@ -1,10 +1,10 @@
 // This page is for users when they are logged in
 // Imported a react component to make swipeable elements like in a swipe app 
-import TinderCard from 'react-tinder-card'
-import {useEffect, useState} from 'react'
 import ChatContainer from '../components/ChatContainer'
-import {useCookies} from 'react-cookie'
+import TinderCard from 'react-tinder-card'
 import axios from 'axios'
+import {useEffect, useState} from 'react'
+import {useCookies} from 'react-cookie'
 import { useNavigate } from 'react-router-dom'
 
 
@@ -20,7 +20,6 @@ const Dashboard = () => {
     const userId = cookies.UserId;
 
   // This FN will get the user's info from the DB using their id (which we get from the variable above)
-
     const getUser = async () => {
         try {
             const response = await axios.get('http://localhost:8000/user', {
@@ -31,7 +30,7 @@ const Dashboard = () => {
             console.log(error)
         }
     }
-
+    // For populating the end-user's swipe container with other users that match their gender interest
     const getGenderedUsers = async () => {
         try {
             const response = await axios.get('http://localhost:8000/gendered-users', {
@@ -50,6 +49,8 @@ const Dashboard = () => {
                 data: { userId: cookies.UserId }
             })
             if (response.status === 200) {
+                removeCookie('UserId', cookies.UserId)
+                removeCookie('AuthToken', cookies.AuthToken)
                 console.log('User deleted successfully')
                 // Navigate to home page after successful deletion
                 navigate('/')

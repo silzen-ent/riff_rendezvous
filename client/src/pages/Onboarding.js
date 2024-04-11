@@ -1,5 +1,5 @@
 // This page is for onboarding new users 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'                         // ADDED THIS SHIT
 import { useCookies } from 'react-cookie'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -7,6 +7,8 @@ import Nav from '../components/Nav'
 
 const Onboarding = () => {
     const [cookies, setCookie, removeCookie] = useCookies(null)
+    const [genres, setGenres] = useState([])                        // ADDED THiS 
+    // const [instruments, setInstruments] = useState([])              // ADDED ThiS 
     const [formData, setFormData] = useState({
         user_id: cookies.UserId,
         first_name: '',
@@ -18,10 +20,23 @@ const Onboarding = () => {
         gender_interest: '',
         url: '',
         about: '', 
-        matches: []
+        matches: [],
+        genres: []      // COMMENTED OUT
+        // instruments: []      // COMMENTED OUT
     })
 
+
+    
+    useEffect(() => {                                               // ADDED THIS SHIT TOO
+        // Fetch genres and instruments from server
+        axios.get('http://localhost:8000/genres').then(res => setGenres(res.data))
+        // axios.get('/instruments').then(res => setInstruments(res.data))
+    }, [])
+
+
     let navigate = useNavigate()
+
+
 
     // This FN handles form submissions from the Onboarding page & updates user's info in the DB
     const handleSubmit = async (e) => {
@@ -208,6 +223,23 @@ const Onboarding = () => {
                         <div className="photo-container">
                             {formData.url && <img src={formData.url} alt="profile pic preview"/>}
                         </div>
+
+                        {/* ADDED THIS AUTOFILLED SHIT BELOW TOO - DIFFERENT FROM SUGGESTIONS */}
+                        <label>Favorite Genres</label>      
+                        <div className="multiple-input-container">
+                            {genres.map((genre) => (
+                                <div key={genre.genre_id}>
+                                    <input
+                                        type="checkbox"
+                                        name="genres"
+                                        value={genre.genre_id}
+                                        onChange={handleChange}
+                                    />
+                                    <label>{genre.genre_name}</label>
+                                </div>
+                            ))}
+                        </div>
+                        
                     </section>
 
                 </form>

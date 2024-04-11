@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const bcrypt = require('bcrypt')
 require('dotenv').config()
+// const { ObjectId } = require('mongodb');         // COMMENTED OUT 
 
 const uri = process.env.URI
 
@@ -64,37 +65,7 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-// This route was giving me issues with Invalid Credentials. 
-// The route is for Logging In
-// app.post('/login', async (req, res) => {
-//     const client = new MongoClient(uri)
-//     const {email, password} = req.body
 
-//     try {
-//         await client.connect()
-//         const database = client.db('app-data')
-//         const users = database.collection('users')
-
-//         const user = await users.findOne({email})
-
-//         const correctPassword = await bcrypt.compare(password, user.hashed_password)
-
-//         if (user && correctPassword) {
-//             const token = jwt.sign(user, email, {
-//                 expiresIn: 60 * 24
-//             })
-//             res.status(201).json({token, userId: user.user_id})
-//         }
-//         res.status(400).json('Invalid Credentials') 
-//     } catch (err) {
-//         console.log(err)
-//     } finally {
-//         await client.close()
-//     }
-// })
-
-
-// This route was giving me issues with Invalid Credentials. 
 // The route is for Logging In
 app.post('/login', async (req, res) => {
     const client = new MongoClient(uri)
@@ -128,7 +99,7 @@ app.post('/login', async (req, res) => {
 })
 
 
-// This route is for getting one user by their user id
+// This route is for getting one user by their user id after Onboarding
 app.get('/user', async (req, res) => {
     const client = new MongoClient(uri)
     const userId = req.query.userId
@@ -170,7 +141,7 @@ app.put('/addmatch', async (req, res) => {
 })
 
 
-// This route is to get all Users by userIds in the Database 
+// This route is to get all Users by userIds in the Database for the MatchesDisplay component
 app.get('/users', async (req, res) => {
     const client = new MongoClient(uri)
     const userIds = JSON.parse(req.query.userIds)
@@ -199,7 +170,7 @@ app.get('/users', async (req, res) => {
 })
 
 
-// This route is to get all the Gendered Users in the Database
+// This route is to get all the Gendered Users in the Database for swiping on the Dashboard 
 app.get('/gendered-users', async (req, res) => { 
     const client = new MongoClient(uri) // create a new client
     const gender = req.query.gender
@@ -220,53 +191,22 @@ app.get('/gendered-users', async (req, res) => {
 
 // Update a User in the Database
 // This route is for updating user's info with the Onboarding Form Data from the client
-// app.put('/user', async (req, res) => {
-//     const client = new MongoClient(uri)
-//     const formData = req.body.formData
-    
-//     try {
-//         await client.connect()
-//         const database = client.db('app-data') 
-//         const users = database.collection('users') 
-
-//         const query = {user_id: formData.user_id}
-
-//         const updateDocument = {
-//             $set: {
-//                 first_name: formData.first_name,
-//                 dob_month: formData.dob_month,
-//                 dob_day: formData.dob_day,
-//                 dob_year: formData.dob_year,
-//                 show_gender: formData.show_gender,
-//                 gender_identity: formData.gender_identity,
-//                 gender_interest: formData.gender_interest,
-//                 url: formData.url,
-//                 about: formData.about,
-//                 matches: formData.matches
-//             },
-//         }
-
-//         const insertedUser = await users.updateOne(query, updateDocument)
-
-//         res.json(insertedUser)
-
-//     } finally {
-//         await client.close()
-//     }
-// })
-
-
 app.put('/user', async (req, res) => {
     const client = new MongoClient(uri)
     const formData = req.body.formData
     
     // Extract "dob_month", "dob_day", and "dob_year" from formData
-    const { dob_month, dob_day, dob_year } = formData;
+    const { dob_month, dob_day, dob_year, genres } = formData;
 
     // Convert these values to integers
     const month = parseInt(dob_month, 10);
     const day = parseInt(dob_day, 10);
     const year = parseInt(dob_year, 10);
+
+    
+    // Convert genres and instruments to arrays of ObjectIds
+    // const genres = formData.genres.map(id => ObjectId(id));
+    // const instruments = formData.instruments.map(id => ObjectId(id));
     
     try {
         await client.connect()
@@ -274,6 +214,7 @@ app.put('/user', async (req, res) => {
         const users = database.collection('users') 
 
         const query = {user_id: formData.user_id}
+        // , { $set: { genre_ids: formData.genre_ids}}
 
         // Include the converted values in your updateDocument
         const updateDocument = {
@@ -287,7 +228,9 @@ app.put('/user', async (req, res) => {
                 gender_interest: formData.gender_interest,
                 url: formData.url,
                 about: formData.about,
-                matches: formData.matches
+                matches: formData.matches,
+                genres: formData.genres         // ADDED THIS SHIT
+                // instruments: formData.instruments
             },
         }
 
@@ -364,6 +307,43 @@ app.delete('/user', async (req, res) => {
         await client.close()
     }
 })
+
+
+
+// Incorporating Genres & Instruments Models into my app
+app.get('/genres', async (req, res) => {
+    const client = new MongoClient(uri)
+    try {
+        await client.connect()
+        const database = client.db('app-data')
+        const genres = database.collection('genres')
+
+        const genreList = await genres.find().toArray()
+        res.status(200).json(genreList)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: 'An error occurred while fetching genres' })
+    } finally {
+        await client.close()
+    }
+})
+
+// app.get('/instruments', async (req, res) => {
+//     const client = new MongoClient(uri)
+//     try {
+//         await client.connect()
+//         const database = client.db('app-data')
+//         const instruments = database.collection('instruments')
+
+//         const instrumentList = await instruments.find().toArray()
+//         res.status(200).json(instrumentList)
+//     } catch (err) {
+//         console.log(err)
+//         res.status(500).json({ error: 'An error occurred while fetching instruments' })
+//     } finally {
+//         await client.close()
+//     }
+// })
 
 
 app.listen(PORT, () => console.log('Server running on PORT ' + PORT)) 
