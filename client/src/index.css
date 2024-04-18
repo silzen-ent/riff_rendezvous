@@ -235,6 +235,18 @@ nav .logo-container .logo {
     width: 100%;
 }
 
+/* Adding space between "Favorite Genres" (name=genres) & "Instruments That You Play" (name=instruments) */
+.onboarding [name="genres"] {
+    margin-top: 25px;
+    margin-bottom: 30px;
+
+}
+
+/* Add horizontal space between Instrument Checkboxes and Instrument Name */
+.onboarding [name="instruments"] {
+    margin-right: 15px;
+}
+
 
 /* ---- Dashboard Page ---- */
 .dashboard {

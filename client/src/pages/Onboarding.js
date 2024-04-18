@@ -8,7 +8,7 @@ import Nav from '../components/Nav'
 const Onboarding = () => {
     const [cookies, setCookie, removeCookie] = useCookies(null)
     const [genres, setGenres] = useState([])                        // ADDED THiS 
-    // const [instruments, setInstruments] = useState([])              // ADDED ThiS 
+    const [instruments, setInstruments] = useState([])              // ADDED ThiS 
     const [formData, setFormData] = useState({
         user_id: cookies.UserId,
         first_name: '',
@@ -21,8 +21,8 @@ const Onboarding = () => {
         url: '',
         about: '', 
         matches: [],
-        genres: []      // COMMENTED OUT
-        // instruments: []      // COMMENTED OUT
+        genres: [],      
+        instruments: []      // COMMENTED OUT
     })
 
 
@@ -30,57 +30,124 @@ const Onboarding = () => {
     useEffect(() => {                                               // ADDED THIS SHIT TOO
         // Fetch genres and instruments from server
         axios.get('http://localhost:8000/genres').then(res => setGenres(res.data))
-        // axios.get('/instruments').then(res => setInstruments(res.data))
+        axios.get('http://localhost:8000/instruments').then(res => setInstruments(res.data))
     }, [])
 
 
+    
     let navigate = useNavigate()
 
 
 
-    // This FN handles form submissions from the Onboarding page & updates user's info in the DB
-    const handleSubmit = async (e) => {
-        e.preventDefault()
+    // When a genre is selected, add the entire genre object to the state
+    const handleGenreSelect = (selectedGenre) => {
+        setFormData(prevState => ({
+            ...prevState,
+            genres: [...prevState.genres, selectedGenre.id] // assuming the genre object has an 'id' field
+        }));
+    };
+
+    // When the form is submitted, send the entire array of genre objects in the request body
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const updatedFormData = {
+            ...formData,
+            genres: formData.genres,
+            instruments: formData.instruments 
+        };
         try {
-            const response = await axios.put('http://localhost:8000/user', {formData})
+            const response = await axios.put('http://localhost:8000/user', { formData: updatedFormData })
             const success = response.status === 200
             if (success) navigate ('/dashboard')
         } catch (err) {
             console.log(err)
         }
+    }
+
+
+    // This FN handles form submissions from the Onboarding page & updates user's info in the DB
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault()
+    //     try {
+    //         const response = await axios.put('http://localhost:8000/user', {formData})
+    //         const success = response.status === 200
+    //         if (success) navigate ('/dashboard')
+    //     } catch (err) {
+    //         console.log(err)
+    //     }
         
-    }    
+    // }    
 
     // This FN handles form changes
+    // const handleChange = (e) => {
+    //     const name = e.target.name
+    //     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    
+    //     if (name === 'genres') {
+    //         const genreId = e.target.value
+    //         const genre = genres.find(g => g.genre_id === genreId)
+    
+    //         if (value) {
+    //             // Checkbox is checked, add the genre to the genres array
+    //             setFormData(prevState => ({
+    //                 ...prevState,
+    //                 genres: [...prevState.genres, genre]
+    //             }))
+    //         } else {
+    //             // Checkbox is unchecked, remove the genre from the genres array
+    //             setFormData(prevState => ({
+    //                 ...prevState,
+    //                 genres: prevState.genres.filter(g => g.genre_id !== genreId)
+    //             }))
+    //         }
+    //     } else {
+    //         setFormData(prevState => ({
+    //             ...prevState,
+    //             [name]: value
+    //         }))
+    //     }
+    // }
+
     const handleChange = (e) => {
         const name = e.target.name
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     
         if (name === 'genres') {
-            const genreId = e.target.value
-            const genre = genres.find(g => g.genre_id === genreId)
-    
             if (value) {
-                // Checkbox is checked, add the genre to the genres array
+                // If the checkbox is checked, add the genre to the array
                 setFormData(prevState => ({
                     ...prevState,
-                    genres: [...prevState.genres, genre]
+                    genres: [...prevState.genres, e.target.value]
                 }))
             } else {
-                // Checkbox is unchecked, remove the genre from the genres array
+                // If the checkbox is unchecked, remove the genre from the array
                 setFormData(prevState => ({
                     ...prevState,
-                    genres: prevState.genres.filter(g => g.genre_id !== genreId)
+                    genres: prevState.genres.filter(genre => genre !== e.target.value)
+                }))
+            }
+        } else if (name === 'instruments') {
+            if (value) {
+                // If the checkbox is checked, add the instrument to the array
+                setFormData(prevState => ({
+                    ...prevState,
+                    instruments: [...prevState.instruments, e.target.value]
+                }))
+            } else {
+                // If the checkbox is unchecked, remove the instrument from the array
+                setFormData(prevState => ({
+                    ...prevState,
+                    instruments: prevState.instruments.filter(instrument => instrument !== e.target.value)
                 }))
             }
         } else {
+            // Handle other form fields
             setFormData(prevState => ({
                 ...prevState,
                 [name]: value
             }))
         }
     }
-
 
     // This is the form that users will fill out to create an account
     return (
@@ -254,6 +321,21 @@ const Onboarding = () => {
                                         onChange={handleChange}
                                     />
                                     <label>{genre.genre_name}</label>
+                                </div>
+                            ))}
+                        </div>
+
+                        <label>Instruments That You Play</label>      
+                        <div className="instruments">
+                            {instruments.map((instrument) => (
+                                <div key={instrument.instrument_id}>
+                                    <input
+                                        type="checkbox"
+                                        name="instruments"
+                                        value={instrument.instrument_id}
+                                        onChange={handleChange}
+                                    />
+                                    <label>{instrument.instrument_name}</label>
                                 </div>
                             ))}
                         </div>
